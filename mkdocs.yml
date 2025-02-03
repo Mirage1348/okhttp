@@ -45,8 +45,8 @@ markdown_extensions:
       smart_enable: all
   - pymdownx.caret
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.inlinehilite
   - pymdownx.magiclink
   - pymdownx.smartsymbols
@@ -95,21 +95,14 @@ nav:
     - 'Events': features/events.md
     - 'HTTPS': features/https.md
     - 'Interceptors': features/interceptors.md
+    - 'R8/Proguard': features/r8_proguard.md
   - 'Recipes': recipes.md
   - 'Security':
     - 'Security': security/security.md
     - 'Providers': security/security_providers.md
     - 'Configuration History': security/tls_configuration_history.md
   - 'Works with OkHttp': works_with_okhttp.md
-  - 'API':
-    - 'okhttp': 4.x/okhttp/okhttp3/index.md
-    - 'brotli': 4.x/okhttp-brotli/okhttp3.brotli/index.md
-    - 'dnsoverhttps': 4.x/okhttp-dnsoverhttps/okhttp3.dnsoverhttps/index.md
-    - 'logging-interceptor': 4.x/logging-interceptor/okhttp3.logging/index.md
-    - 'sse': 4.x/okhttp-sse/okhttp3.sse/index.md
-    - 'tls': 4.x/okhttp-tls/okhttp3.tls/index.md
-    - 'urlconnection': 4.x/okhttp-urlconnection/okhttp3/index.md
-    - 'mockwebserver': 4.x/mockwebserver/okhttp3.mockwebserver/index.md
+  - 'API': 5.x/okhttp/okhttp3/
   - 'Change Logs':
     - 'Change Log': changelogs/changelog.md
     - '4.x Change Log': changelogs/changelog_4x.md
@@ -122,4 +115,3 @@ nav:
     - 'Code of Conduct': contribute/code_of_conduct.md
     - 'Concurrency': contribute/concurrency.md
     - 'Debug Logging': contribute/debug_logging.md
-

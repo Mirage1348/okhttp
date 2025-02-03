@@ -15,12 +15,14 @@
  */
 package okhttp3.compare
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.startsWith
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.io.entity.EntityUtils
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
@@ -39,8 +41,11 @@ class ApacheHttpClientTest {
   }
 
   @Test fun get(server: MockWebServer) {
-    server.enqueue(MockResponse()
-        .setBody("hello, Apache HttpClient 5.x"))
+    server.enqueue(
+      MockResponse.Builder()
+        .body("hello, Apache HttpClient 5.x")
+        .build(),
+    )
 
     val request = HttpGet(server.url("/").toUri())
     request.addHeader("Accept", "text/plain")
@@ -51,9 +56,8 @@ class ApacheHttpClientTest {
     }
 
     val recorded = server.takeRequest()
-    assertThat(recorded.getHeader("Accept")).isEqualTo("text/plain")
-    assertThat(recorded.getHeader("Accept-Encoding")).isEqualTo("gzip, x-gzip, deflate")
-    assertThat(recorded.getHeader("Connection")).isEqualTo("keep-alive")
-    assertThat(recorded.getHeader("User-Agent")).startsWith("Apache-HttpClient/")
+    assertThat(recorded.headers["Accept"]).isEqualTo("text/plain")
+    assertThat(recorded.headers["Accept-Encoding"]).isEqualTo("gzip, x-gzip, deflate")
+    assertThat(recorded.headers["User-Agent"]!!).startsWith("Apache-HttpClient/")
   }
 }

@@ -16,7 +16,6 @@
 package okhttp3.tls.internal.der
 
 import java.math.BigInteger
-import okhttp3.internal.code
 import okio.Buffer
 import okio.BufferedSink
 import okio.ByteString
@@ -47,7 +46,12 @@ internal class DerWriter(sink: BufferedSink) {
    */
   var constructed = false
 
-  fun write(name: String, tagClass: Int, tag: Long, block: (BufferedSink) -> Unit) {
+  fun write(
+    name: String,
+    tagClass: Int,
+    tag: Long,
+    block: (BufferedSink) -> Unit,
+  ) {
     val constructedBit: Int
     val content = Buffer()
 
@@ -119,11 +123,12 @@ internal class DerWriter(sink: BufferedSink) {
   fun writeLong(v: Long) {
     val sink = sink()
 
-    val lengthBitCount: Int = if (v < 0L) {
-      65 - java.lang.Long.numberOfLeadingZeros(v xor -1L)
-    } else {
-      65 - java.lang.Long.numberOfLeadingZeros(v)
-    }
+    val lengthBitCount: Int =
+      if (v < 0L) {
+        65 - java.lang.Long.numberOfLeadingZeros(v xor -1L)
+      } else {
+        65 - java.lang.Long.numberOfLeadingZeros(v)
+      }
 
     val lengthByteCount = (lengthBitCount + 7) / 8
     for (shift in (lengthByteCount - 1) * 8 downTo 0 step 8) {
@@ -161,7 +166,8 @@ internal class DerWriter(sink: BufferedSink) {
 
   fun writeRelativeObjectIdentifier(s: String) {
     // Add a leading dot so each subidentifier has a dot prefix.
-    val utf8 = Buffer()
+    val utf8 =
+      Buffer()
         .writeByte('.'.code.toByte().toInt())
         .writeUtf8(s)
 

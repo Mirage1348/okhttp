@@ -15,10 +15,11 @@
  */
 package okhttp3
 
+import assertk.assertThat
+import assertk.assertions.containsExactly
 import java.net.InetAddress
 import java.net.UnknownHostException
 import okio.Buffer
-import org.assertj.core.api.Assertions.assertThat
 
 class FakeDns : Dns {
   private val hostAddresses: MutableMap<String, List<InetAddress>> = mutableMapOf()
@@ -28,7 +29,7 @@ class FakeDns : Dns {
   /** Sets the results for `hostname`.  */
   operator fun set(
     hostname: String,
-    addresses: List<InetAddress>
+    addresses: List<InetAddress>,
   ): FakeDns {
     hostAddresses[hostname] = addresses
     return this
@@ -40,9 +41,10 @@ class FakeDns : Dns {
     return this
   }
 
-  @Throws(UnknownHostException::class) fun lookup(
+  @Throws(UnknownHostException::class)
+  fun lookup(
     hostname: String,
-    index: Int
+    index: Int,
   ): InetAddress {
     return hostAddresses[hostname]!![index]
   }
@@ -65,7 +67,7 @@ class FakeDns : Dns {
     return (from until nextAddress)
       .map {
         return@map InetAddress.getByAddress(
-          Buffer().writeInt(it.toInt()).readByteArray()
+          Buffer().writeInt(it.toInt()).readByteArray(),
         )
       }
   }
@@ -77,7 +79,7 @@ class FakeDns : Dns {
     return (from until nextAddress)
       .map {
         return@map InetAddress.getByAddress(
-          Buffer().writeLong(0L).writeLong(it).readByteArray()
+          Buffer().writeLong(0L).writeLong(it).readByteArray(),
         )
       }
   }

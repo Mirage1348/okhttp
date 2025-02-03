@@ -15,7 +15,11 @@
  */
 package mockwebserver3
 
+import mockwebserver3.SocketPolicy.KeepOpen
+import okhttp3.ExperimentalOkHttpApi
+
 /** Handler for mock server requests. */
+@ExperimentalOkHttpApi
 abstract class Dispatcher {
   /**
    * Returns a response to satisfy `request`. This method may block (for instance, to wait on
@@ -31,7 +35,7 @@ abstract class Dispatcher {
    * request bodies.
    */
   open fun peek(): MockResponse {
-    return MockResponse().apply { this.socketPolicy = SocketPolicy.KEEP_OPEN }
+    return MockResponse(socketPolicy = KeepOpen)
   }
 
   /**

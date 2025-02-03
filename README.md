@@ -22,6 +22,27 @@ configured to fall back for broad connectivity.
 Using OkHttp is easy. Its request/response API is designed with fluent builders and immutability. It
 supports both synchronous blocking calls and async calls with callbacks.
 
+A well behaved user agent
+-------------------------
+
+OkHttp follows modern HTTP specifications such as
+
+* HTTP/1.1 - [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231)
+* HTTP/2 - [RFC 9113](https://datatracker.ietf.org/doc/html/rfc9113)
+* Websockets - [RFC 6455](https://datatracker.ietf.org/doc/html/rfc6455)
+* SSE - [Server-sent events](https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events)
+
+Where the spec is ambiguous, OkHttp follows modern user agents such as popular Browsers or common HTTP Libraries.
+
+OkHttp is principled and avoids being overly configurable, especially when such configuration is
+to workaround a buggy server, test invalid scenarios or that contradict the relevant RFC. 
+Other HTTP libraries exist that fill that gap allowing extensive customisation including potentially
+invalid requests.
+
+Example Limitations
+
+* Does not allow GET with a body.
+* Cache is not an interface with alternative implementations.
 
 Get a URL
 ---------
@@ -49,8 +70,7 @@ Post to a Server
 This program posts data to a service. [Full source][post_example].
 
 ```java
-public static final MediaType JSON
-    = MediaType.get("application/json; charset=utf-8");
+public static final MediaType JSON = MediaType.get("application/json");
 
 OkHttpClient client = new OkHttpClient();
 
@@ -82,16 +102,15 @@ track][tls_history] the dynamic TLS ecosystem and adjust OkHttp to improve conne
 security.
 
 OkHttp uses your platform's built-in TLS implementation. On Java platforms OkHttp also supports
-[Conscrypt][conscrypt], which integrates BoringSSL with Java. OkHttp will use Conscrypt if it is
+[Conscrypt][conscrypt], which integrates [BoringSSL](https://github.com/google/boringssl) with Java. OkHttp will use Conscrypt if it is
 the first security provider:
 
 ```java
 Security.insertProviderAt(Conscrypt.newProvider(), 1);
 ```
 
-The OkHttp 3.12.x branch supports Android 2.3+ (API level 9+) and Java 7+. These platforms lack
-support for TLS 1.2 and should not be used. But because upgrading is difficult, we will backport
-critical fixes to the [3.12.x branch][okhttp_312x] through December 31, 2021.
+The OkHttp `3.12.x` branch supports Android 2.3+ (API level 9+) and Java 7+. These platforms lack
+support for TLS 1.2 and should not be used.
 
 
 Releases
@@ -99,10 +118,10 @@ Releases
 
 Our [change log][changelog] has release history.
 
-The latest release is available on [Maven Central](https://search.maven.org/artifact/com.squareup.okhttp3/okhttp/4.9.3/jar).
+The latest release is available on [Maven Central](https://search.maven.org/artifact/com.squareup.okhttp3/okhttp/4.12.0/jar).
 
 ```kotlin
-implementation("com.squareup.okhttp3:okhttp:4.9.3")
+implementation("com.squareup.okhttp3:okhttp:4.12.0")
 ```
 
 Snapshot builds are [available][snap]. [R8 and ProGuard][r8_proguard] rules are available.
@@ -112,7 +131,7 @@ Also, we have a [bill of materials (BOM)][bom] available to help you keep OkHttp
 ```kotlin
     dependencies {
        // define a BOM and its version
-       implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.3"))
+       implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
 
        // define any required OkHttp artifacts without version
        implementation("com.squareup.okhttp3:okhttp")
@@ -125,17 +144,22 @@ MockWebServer
 
 OkHttp includes a library for testing HTTP, HTTPS, and HTTP/2 clients.
 
-The latest release is available on [Maven Central](https://search.maven.org/artifact/com.squareup.okhttp3/mockwebserver/4.9.3/jar).
+The latest release is available on [Maven Central](https://search.maven.org/artifact/com.squareup.okhttp3/mockwebserver/4.12.0/jar).
 
 ```kotlin
-testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 ```
+
+MockWebServer is used for firstly for internal testing, and for basic testing of apps using OkHttp client. 
+It is not a full featured HTTP testing library that is developed standalone. It is not being actively developed
+for new features. As such you might find your needs outgrow MockWebServer and you may which to use a 
+more full featured testing library such as [MockServer](https://www.mock-server.com/).
 
 GraalVM Native Image
 --------------------
 
 Building your native images with Graal https://www.graalvm.org/ should work automatically.
-This is not currently in a final released version, so 5.0.0-alpha.2 should be used.
+This is not currently in a final released version, so `5.0.0-alpha.2` should be used.
 Please report any bugs or workarounds you find.
 
 See the okcurl module for an example build.
@@ -169,7 +193,7 @@ limitations under the License.
  [conscrypt]: https://github.com/google/conscrypt/
  [get_example]: https://raw.github.com/square/okhttp/master/samples/guide/src/main/java/okhttp3/guide/GetExample.java
  [kotlin]: https://kotlinlang.org/
- [okhttp3_pro]: https://raw.githubusercontent.com/square/okhttp/master/okhttp/src/jvmMain/resources/META-INF/proguard/okhttp3.pro
+ [okhttp3_pro]: https://raw.githubusercontent.com/square/okhttp/master/okhttp/src/main/resources/META-INF/proguard/okhttp3.pro
  [okhttp_312x]: https://github.com/square/okhttp/tree/okhttp_3.12.x
  [okhttp]: https://square.github.io/okhttp/
  [okio]: https://github.com/square/okio

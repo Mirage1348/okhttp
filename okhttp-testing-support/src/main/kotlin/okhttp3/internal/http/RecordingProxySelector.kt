@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package okhttp3.internal.http
 
+import assertk.assertThat
+import assertk.assertions.containsExactly
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -22,13 +26,12 @@ import java.net.ProxySelector
 import java.net.SocketAddress
 import java.net.URI
 import okhttp3.internal.format
-import org.assertj.core.api.Assertions.assertThat
 
 class RecordingProxySelector : ProxySelector() {
   @JvmField val proxies = mutableListOf<Proxy>()
 
-  private val requestedUris = mutableListOf<URI>()
-  private val failures = mutableListOf<String>()
+  val requestedUris = mutableListOf<URI>()
+  val failures = mutableListOf<String>()
 
   override fun select(uri: URI): List<Proxy> {
     requestedUris.add(uri)
@@ -40,7 +43,11 @@ class RecordingProxySelector : ProxySelector() {
     requestedUris.clear()
   }
 
-  override fun connectFailed(uri: URI, sa: SocketAddress, ioe: IOException) {
+  override fun connectFailed(
+    uri: URI,
+    sa: SocketAddress,
+    ioe: IOException,
+  ) {
     val socketAddress = sa as InetSocketAddress
     failures.add(format("%s %s:%d %s", uri, socketAddress, socketAddress.port, ioe.message!!))
   }

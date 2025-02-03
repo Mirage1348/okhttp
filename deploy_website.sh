@@ -2,9 +2,7 @@
 
 # The website is built using MkDocs with the Material theme.
 # https://squidfunk.github.io/mkdocs-material/
-# It requires Python to run.
-# Install the packages with the following command:
-# pip install mkdocs mkdocs-material mkdocs-redirects
+# It requires python3 to run.
 
 set -ex
 
@@ -24,35 +22,9 @@ git clone $REPO $DIR
 cd $DIR
 
 # Generate the API docs
-./gradlew \
-  :mockwebserver:dokkaGfm \
-  :okhttp-brotli:dokkaGfm \
-  :okhttp-dnsoverhttps:dokkaGfm \
-  :logging-interceptor:dokkaGfm \
-  :okhttp-sse:dokkaGfm \
-  :okhttp-tls:dokkaGfm \
-  :okhttp-urlconnection:dokkaGfm \
-  :okhttp:dokkaGfm
+./gradlew dokkaHtmlMultiModule
 
-# Dokka filenames like `-http-url/index.md` don't work well with MkDocs <title> tags.
-# Assign metadata to the file's first Markdown heading.
-# https://www.mkdocs.org/user-guide/writing-your-docs/#meta-data
-title_markdown_file() {
-  TITLE_PATTERN="s/^[#]+ *(.*)/title: \1 - OkHttp/"
-  echo "---"                                                     > "$1.fixed"
-  cat $1 | sed -E "$TITLE_PATTERN" | grep "title: " | head -n 1 >> "$1.fixed"
-  echo "---"                                                    >> "$1.fixed"
-  echo                                                          >> "$1.fixed"
-  cat $1                                                        >> "$1.fixed"
-  mv "$1.fixed" "$1"
-}
-
-set +x
-for MARKDOWN_FILE in $(find docs/4.x -name '*.md'); do
-  echo $MARKDOWN_FILE
-  title_markdown_file $MARKDOWN_FILE
-done
-set -x
+mv ./build/dokka/htmlMultiModule docs/5.x
 
 # Copy in special files that GitHub wants in the project root.
 cat README.md | grep -v 'project website' > docs/index.md
@@ -60,6 +32,9 @@ cp CHANGELOG.md docs/changelogs/changelog.md
 cp CONTRIBUTING.md docs/contribute/contributing.md
 
 # Build the site and push the new files up to GitHub
+python3 -m venv venv
+source venv/bin/activate
+pip install mkdocs-material mkdocs-redirects
 mkdocs gh-deploy
 
 # Restore Javadocs from 1.x, 2.x, and 3.x.

@@ -15,38 +15,41 @@
  */
 package okhttp3
 
-import org.assertj.core.api.Assertions.assertThat
+import assertk.assertThat
+import assertk.assertions.hasMessage
+import kotlin.test.assertFailsWith
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.junit.jupiter.api.fail
 
 class OkHttpClientTestRuleTest {
   lateinit var extensionContext: ExtensionContext
 
-  @RegisterExtension @JvmField val beforeEachCallback = BeforeEachCallback { context ->
-    this@OkHttpClientTestRuleTest.extensionContext = context
-  }
+  @RegisterExtension @JvmField
+  val beforeEachCallback =
+    BeforeEachCallback { context ->
+      this@OkHttpClientTestRuleTest.extensionContext = context
+    }
 
   @Test fun uncaughtException() {
     val testRule = OkHttpClientTestRule()
     testRule.beforeEach(extensionContext)
 
-    val thread = object : Thread() {
-      override fun run() {
-        throw RuntimeException("boom!")
+    val thread =
+      object : Thread() {
+        override fun run() {
+          throw RuntimeException("boom!")
+        }
       }
-    }
     thread.start()
     thread.join()
 
-    try {
+    assertFailsWith<AssertionError> {
       testRule.afterEach(extensionContext)
-      fail("")
-    } catch (expected: AssertionError) {
+    }.also { expected ->
       assertThat(expected).hasMessage("uncaught exception thrown during test")
-      assertThat(expected.cause).hasMessage("boom!")
+      assertThat(expected.cause!!).hasMessage("boom!")
     }
   }
 }

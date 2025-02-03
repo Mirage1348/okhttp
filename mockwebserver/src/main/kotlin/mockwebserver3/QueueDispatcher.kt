@@ -20,10 +20,12 @@ import java.net.HttpURLConnection.HTTP_UNAVAILABLE
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.logging.Logger
+import okhttp3.ExperimentalOkHttpApi
 
 /**
  * Default dispatcher that processes a script of responses. Populate the script by calling [enqueueResponse].
  */
+@ExperimentalOkHttpApi
 open class QueueDispatcher : Dispatcher() {
   protected val responseQueue: BlockingQueue<MockResponse> = LinkedBlockingQueue()
   private var failFastResponse: MockResponse? = null
@@ -34,7 +36,7 @@ open class QueueDispatcher : Dispatcher() {
     val requestLine = request.requestLine
     if (requestLine == "GET /favicon.ico HTTP/1.1") {
       logger.info("served $requestLine")
-      return MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
+      return MockResponse(code = HttpURLConnection.HTTP_NOT_FOUND)
     }
 
     if (failFastResponse != null && responseQueue.peek() == null) {
@@ -68,11 +70,12 @@ open class QueueDispatcher : Dispatcher() {
   }
 
   open fun setFailFast(failFast: Boolean) {
-    val failFastResponse = if (failFast) {
-      MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
-    } else {
-      null
-    }
+    val failFastResponse =
+      if (failFast) {
+        MockResponse(code = HttpURLConnection.HTTP_NOT_FOUND)
+      } else {
+        null
+      }
     setFailFast(failFastResponse)
   }
 
@@ -80,14 +83,13 @@ open class QueueDispatcher : Dispatcher() {
     this.failFastResponse = failFastResponse
   }
 
+  @ExperimentalOkHttpApi
   companion object {
     /**
      * Enqueued on shutdown to release threads waiting on [dispatch]. Note that this response
      * isn't transmitted because the connection is closed before this response is returned.
      */
-    private val DEAD_LETTER = MockResponse().apply {
-      this.status = "HTTP/1.1 $HTTP_UNAVAILABLE shutting down"
-    }
+    private val DEAD_LETTER = MockResponse(code = HTTP_UNAVAILABLE)
 
     private val logger = Logger.getLogger(QueueDispatcher::class.java.name)
   }
